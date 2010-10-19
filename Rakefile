@@ -6,7 +6,7 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "amp-hg"
     gem.summary = %Q{The mercurial plugin for Amp.}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.description = %Q{This gem provides mercurial support to Amp. It is bundled with Amp itself.}
     gem.email = "michael.j.edgar@dartmouth.edu"
     gem.homepage = "http://github.com/michaeledgar/amp-hg"
     gem.authors = ["Michael Edgar"]
