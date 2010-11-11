@@ -122,7 +122,7 @@ module Amp
       #   the given revision and the one before that
       def read_delta(node)
         r = self.revision_index_for_node node
-        return self.class.parse(Diffs::Mercurial::MercurialDiff.patch_text(self.revision_diff(r-1, r)))
+        return self.class.parse(Mercurial::Diffs::MercurialDiff.patch_text(self.revision_diff(r-1, r)))
       end
       
       ##

@@ -186,7 +186,7 @@ module Amp
           
           while chain.any?
             delta = get_chunk(chain.pop)
-            text = Diffs::Mercurial::MercurialPatch.apply_patches(text, [delta])
+            text = Mercurial::Diffs::MercurialPatch.apply_patches(text, [delta])
           end
           p1, p2 = parents_for_node node
           

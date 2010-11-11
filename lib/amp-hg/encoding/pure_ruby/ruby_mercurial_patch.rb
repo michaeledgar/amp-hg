@@ -15,8 +15,8 @@
 #######################################################################
 
 module Amp
-  module Diffs
-    module Mercurial
+  module Mercurial
+    module Diffs
       
       ##
       # This handles applying patches in mercurial. yay!!!!

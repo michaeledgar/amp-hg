@@ -630,7 +630,7 @@ module Amp
         if (rev1 + 1 == rev2) && self[rev1].base_rev == self[rev2].base_rev
           return get_chunk(rev2) 
         end                        
-        Diffs::Mercurial::MercurialDiff.text_diff(decompress_revision(node_id_for_index(rev1)),
+        Mercurial::Diffs::MercurialDiff.text_diff(decompress_revision(node_id_for_index(rev1)),
                                                   decompress_revision(node_id_for_index(rev2)))
       end
       
@@ -664,7 +664,7 @@ module Amp
         bins = []
         (base + 1).upto(rev) {|r| bins << get_chunk(r, data_file)}
         #bins = ((base+1)..rev).map {|r| get_chunk(r, data_file)}
-        text = Diffs::Mercurial::MercurialPatch.apply_patches(text, bins)
+        text = Mercurial::Diffs::MercurialPatch.apply_patches(text, bins)
         
         p1, p2 = parents_for_node node
         if node != RevlogSupport::Support.history_hash(text, p1, p2)
@@ -748,7 +748,7 @@ module Amp
         if curr > 0
           if d.nil? || d.empty?
             ptext = decompress_revision node_id_for_index(prev)
-            d = Diffs::Mercurial::MercurialDiff.text_diff(ptext, text)
+            d = Mercurial::Diffs::MercurialDiff.text_diff(ptext, text)
           end
           data = RevlogSupport::Support.compress d
           len = data[:compression].size + data[:text].size
@@ -822,7 +822,7 @@ module Amp
           
           if a == -1
             data = decompress_revision nb
-            meta += Diffs::Mercurial::MercurialDiff.trivial_diff_header(d.size)
+            meta += Mercurial::Diffs::MercurialDiff.trivial_diff_header(d.size)
           else
             data = revision_diff(a, b)
           end
@@ -896,7 +896,7 @@ module Amp
             if chain == prev
               cdelta = RevlogSupport::Support.compress delta
               cdeltalen = cdelta[:compression].size + cdelta[:text].size
-              text_len = Diffs::Mercurial::MercurialPatch.patched_size text_len, delta
+              text_len = Mercurial::Diffs::MercurialPatch.patched_size text_len, delta
             end
             
             if chain != prev || (endpt - start + cdeltalen) > text_len * 2
@@ -907,7 +907,7 @@ module Amp
               if text.size == 0
                 text = delta[12..-1]
               else
-                text = Diffs::Mercurial::MercurialPatch.apply_patches(text, [delta])
+                text = Mercurial::Diffs::MercurialPatch.apply_patches(text, [delta])
               end
               chk = add_revision(text, journal, link, parent1, parent2, 
                                     nil, index_file_handle)

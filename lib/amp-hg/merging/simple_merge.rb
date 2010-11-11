@@ -312,7 +312,7 @@ module Amp
             type, idx_z, z_match, idx_a, a_match, idx_b, b_match = region
             a_region = @a[idx_a..(a_match-1)]
             b_region = @b[idx_b..(b_match-1)]
-            matches = Amp::Diffs::Mercurial::MercurialDiff.get_matching_blocks(a_region.join, b_region.join)
+            matches = Amp::Mercurial::Diffs::MercurialDiff.get_matching_blocks(a_region.join, b_region.join)
             
             next_a = idx_a
             next_b = idx_b
@@ -348,8 +348,8 @@ module Amp
         #   matches).
         def find_sync_regions
           idx_a = idx_b = 0
-          a_matches = Amp::Diffs::Mercurial::MercurialDiff.get_matching_blocks(@base_text, @a_text)
-          b_matches = Amp::Diffs::Mercurial::MercurialDiff.get_matching_blocks(@base_text, @b_text)
+          a_matches = Amp::Mercurial::Diffs::MercurialDiff.get_matching_blocks(@base_text, @a_text)
+          b_matches = Amp::Mercurial::Diffs::MercurialDiff.get_matching_blocks(@base_text, @b_text)
           
           len_a, len_b = a_matches.size, b_matches.size
           sync_regions = []
