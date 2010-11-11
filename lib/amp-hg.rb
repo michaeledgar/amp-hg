@@ -1,9 +1,7 @@
-class Amp::Plugins::Hg < Amp::Plugins::Base
-  def initialize(opts)
-    @opts = opts
-  end
-  
-  def load!
-    puts "Loading amp-hg..."
-  end
-end
+puts 'Loading amp-hg...'
+
+require 'zlib'
+require 'stringio'
+
+# Must require the HgPicker or it won't be found.
+require 'amp-hg/repository.rb'
