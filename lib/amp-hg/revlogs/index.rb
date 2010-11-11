@@ -110,7 +110,7 @@ module Amp
         
         # Fixes the values to force them to be signed (possible to be negative)
         def fix_signs
-          self.offset_flags     = self.offset_flags.byte_swap_64
+          self.offset_flags     = Support::EncodingUtils.network_to_host_64(self.offset_flags)
           self.parent_one_rev   = self.parent_one_rev.to_signed_32
           self.parent_two_rev   = self.parent_two_rev.to_signed_32
           

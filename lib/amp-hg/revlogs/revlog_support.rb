@@ -60,7 +60,7 @@ module Amp
         # @return [String] the digest of the two parents and the extra text
         def history_hash(text, p1, p2)
           list = [p1, p2].sort
-          s = list[0].sha1
+          s = Amp::Core::Support::StringUtils.sha1(list[0])
           s.update list[1]
           s.update text
           s.digest

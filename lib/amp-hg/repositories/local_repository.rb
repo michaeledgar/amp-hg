@@ -739,7 +739,7 @@ module Amp
         # the recipient has any changegnode we aren't sending them.
         #
         # @param [Array<String>] common the set of common nodes between remote and self
-        # @param [Amp::Repository] source
+        # @param [Amp::Core::Repository] source
         def get_changegroup(common, source)
           # Call the hooks
           run_hook :pre_outgoing, :throw => true, :source => source
@@ -1309,7 +1309,7 @@ module Amp
         # 
         # All the ancestors of base are in self and in remote.
         # 
-        # @param [Amp::Repository] remote the repository we're pulling from
+        # @param [Amp::Core::Repository] remote the repository we're pulling from
         # @param [(Array<String>, Array<String>, Array<String>)] the common nodes, missing nodes, and
         #   remote heads
         def common_nodes(remote, opts={:heads => nil, :force => nil, :base => nil})
@@ -1731,7 +1731,7 @@ module Amp
         # 
         # It's so simple it's not even funny.
         # 
-        # @param [Amp::Repository] remote repository to pull from
+        # @param [Amp::Core::Repository] remote repository to pull from
         # @param [Array<String>] heads list of revs to clone (forces use of pull)
         # @param [Boolean] stream do we stream from the remote source?
         def clone(remote, opts={:revs => [], :stream => false})
@@ -1753,7 +1753,7 @@ module Amp
         ##
         # Stream in the data from +remote+.
         # 
-        # @param [Amp::Repository] remote repository to pull from
+        # @param [Amp::Core::Repository] remote repository to pull from
         # @return [Integer] the number of heads in the repository minus 1
         def stream_in(remote)
           remote.stream_out do |f|

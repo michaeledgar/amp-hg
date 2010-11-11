@@ -153,7 +153,7 @@ module Amp
       def data_start_for_index(index)
         result = self[index].true_offset
         if Amp::Support::SYSTEM[:endian] == :big
-          result = result.byte_swap_64
+          result = Support::EncodingUtils.network_to_host_64(result)
         end
         result
       end

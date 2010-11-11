@@ -22,7 +22,7 @@ module Amp
     # revision. For example, if the user specifies revision # 36, or revision
     # 3adf21, then we can look those up, and work within the repository at the
     # moment of that revision.
-    class Changeset < Amp::Repositories::AbstractChangeset
+    class Changeset < Amp::Core::Repositories::AbstractChangeset
       include Mercurial::RevlogSupport::Node
       
       attr_reader :repo

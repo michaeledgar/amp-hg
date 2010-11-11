@@ -177,8 +177,8 @@ module Amp
             end
             l = header + (a.map {|line| remove_line(line, options)})
           else
-            a.force_encoding("UTF-8") if ruby_19?
-            b.force_encoding("UTF-8") if ruby_19?
+            a.force_encoding("UTF-8") if RUBY_VERSION >= "1.9"
+            b.force_encoding("UTF-8") if RUBY_VERSION >= "1.9"
             al = a.split_lines_better
             bl = b.split_lines_better
             l = bunidiff(a, b, al, bl, "a/"+fn1, "b/"+fn2, options)
@@ -205,7 +205,7 @@ module Amp
           if r
             l.unshift diff_line(r, fn1, fn2, options)
           end
-          l.each {|x| x.force_encoding("ASCII-8BIT")}  if ruby_19?
+          l.each {|x| x.force_encoding("ASCII-8BIT")}  if RUBY_VERSION >= "1.9"
           
           l.join
         end

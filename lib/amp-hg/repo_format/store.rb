@@ -369,12 +369,13 @@ module Amp
         #   capital letters before we downcase them? (e.g. if true, "A" => "_a")
         def illegal_character_map(underscore=true)
           e = '_'
-          win_reserved = "\\:*?\"<>|".split("").map {|x| x.ord}
+          win_reserved = "\\:*?\"<>|".split("").map {|x| Support::StringUtils.ord(x) }
           cmap = {}; 0.upto(126) {|x| cmap[x.chr] = x.chr}
           ((0..31).to_a + (126..255).to_a + win_reserved).each do |x|
             cmap[x.chr] = "~%02x" % x
           end
-          ((("A".ord)..("Z".ord)).to_a + [e.ord]).each do |x|
+          ((Support::StringUtils.ord("A")..Support::StringUtils.ord("Z")).to_a +
+           [Support::StringUtils.ord(e)]).each do |x|
             cmap[x.chr] = e + x.chr.downcase if underscore
             cmap[x.chr] = x.chr.downcase     unless underscore
           end
@@ -433,11 +434,11 @@ module Amp
             if n.any?
               base = n.split('.')[0]
               if !(base.nil?) && base.any? && WINDOWS_RESERVED_FILENAMES.include?(base)
-                ec = "~%02x" % n[2,1].ord
+                ec = "~%02x" % Support::StringUtils.ord(n[2,1])
                 n = n[0..1] + ec + n[3..-1]
               end
               if ['.',' '].include? n[-1,1]
-                n = n[0..-2] + ("~%02x" % n[-1,1].ord)
+                n = n[0..-2] + ("~%02x" % Support::StringUtils.ord(n[-1,1]))
               end
             end
             res << n
@@ -468,7 +469,7 @@ module Amp
           ndpath = path["data/".size..-1]
           res = "data/" + auxilliary_encode(encode_filename(ndpath))
           if res.size > MAX_PATH_LEN_IN_HGSTORE
-            digest = path.sha1.hexdigest
+            digest = Amp::Core::Support::StringUtils.sha1(path).hexdigest
             aep = auxilliary_encode(lower_encode(ndpath))
             root, ext = FileHelpers.split_extension aep
             parts = aep.split('/')
