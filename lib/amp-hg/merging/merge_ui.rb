@@ -17,9 +17,8 @@
 require 'tempfile'
 
 module Amp
-  module Merges
-    module Mercurial
-      
+  module Mercurial
+    module Merges
       ##
       # This module handles figuring out how to merge files using the user's
       # preferences. It is mixed into the UI class. The UI class must implement
@@ -309,7 +308,7 @@ module Amp
         
         ##
         # Checks to see if a given tool is available given the necessary settings.
-        # 
+        #
         # @todo add GUI check
         # @param [String] tool the name of the tool we want to check
         # @param [String] pat the pattern we matched to get here. Could be nil.

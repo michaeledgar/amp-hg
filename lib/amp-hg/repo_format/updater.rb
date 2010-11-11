@@ -15,9 +15,8 @@
 #######################################################################
 
 module Amp
-  module Repositories
-    module Mercurial
-      
+  module Mercurial
+    module RepositoryFormat
       ##
       # This module contains all the code that makes a repository able to
       # update its working directory.
@@ -39,9 +38,9 @@ module Amp
         # @return [Array<Integer>] a set of statistics about the update. In the form:
         #   [updated, merged, removed, unresolved] where each entry is the # of files in that category.
         def update(node=nil, branch_merge=false, force=false, filter=nil)
-          updater = Updater.new(self, :node => node, 
-                                      :branch_merge => branch_merge, 
-                                      :force => force, 
+          updater = Updater.new(self, :node => node,
+                                      :branch_merge => branch_merge,
+                                      :force => force,
                                       :filter => filter)
           updater.update
         end
@@ -313,8 +312,8 @@ module Amp
           #
           # @return [Boolean] is it a fast-forward merge/
           def fast_forward?
-            branch_merge && ancestor != remote && 
-                            ancestor == @local_parent && 
+            branch_merge && ancestor != remote &&
+                            ancestor == @local_parent &&
                             @local_parent.branch != remote.branch
           end
           
@@ -381,7 +380,7 @@ module Amp
           
           ##
           # Adds a "get" action for the given file and flags.
-          # This action replaces the local file with the remote file 
+          # This action replaces the local file with the remote file
           # with the given name and sets its flags to the specified flag.
           def get(file, flags); @actions << Action::GetAction.new(file, flags); end
           
@@ -408,7 +407,7 @@ module Amp
           # @param [String] file_dest the filename to use after merging
           # @param [String] flags the flags to assign the file when we finish merging
           # @param [Boolean] move should we move the file?
-          def merge(file, remote_file, file_dest, flags, move) 
+          def merge(file, remote_file, file_dest, flags, move)
             @actions << Action::MergeAction.new(file, remote_file, file_dest, flags, move)
           end
           
@@ -476,7 +475,7 @@ module Amp
             if ancestor == remote
               raise abort("can't merge with ancestor")
             elsif ancestor == @local_parent
-              # If we're at the branch point, without a difference in branch names, just do an update. 
+              # If we're at the branch point, without a difference in branch names, just do an update.
               # Kind of the opposite of the last case, only isntead of trying to merge directly backward,
               # we're trying to merge directly forward. That's wrong.
               if @local_parent.branch == remote.branch
@@ -527,7 +526,7 @@ module Amp
           ##
           # This method will make sure that there are no differences between
           # untracked files in the working directory, and tracked files in
-          # the new changeset. 
+          # the new changeset.
           #
           # @raise [AbortError] if an untracked file in the working directory is different from
           #   a tracked file in the target changeset, this abort error will be raised.
@@ -559,13 +558,13 @@ module Amp
           
           ##
           # Forget removed files (docs ripped from mercurial)
-          # 
+          #
           # If we're jumping between revisions (as opposed to merging), and if
           # neither the working directory nor the target rev has the file,
           # then we need to remove it from the dirstate, to prevent the
           # dirstate from listing the file when it is no longer in the
           # manifest.
-          # 
+          #
           # If we're merging, and the other revision has removed a file
           # that is not present in the working directory, we need to mark it
           # as removed.
@@ -667,7 +666,7 @@ module Amp
           # @param [Hash] copied_files a lookup hash for checking if a file has
           #   been involved in a copy
           def update_remote_file(file, node, copy, copied_files)
-            return if should_filter?(file) || 
+            return if should_filter?(file) ||
                       local_manifest[file] ||
                       copied_files[file]
             
@@ -765,7 +764,7 @@ module Amp
           # @param [String] file the name of the file being inspected
           # @param [String] renamed_file the old name of the file
           def update_locally_copied(file, renamed_file)
-            if !remote_manifest[renamed_file] 
+            if !remote_manifest[renamed_file]
             # directory rename (I don't know what's going on here)
             then directory file, nil, renamed_file, working_changeset.flags[file]
             # We found the old name of the file in the remote manifest.
@@ -778,8 +777,8 @@ module Amp
           # remote changeset deleted our file somewhere. What do we do?
           #
           # Well, if we've changed it since the ancestor (i.e., we've been
-          # using the file actively), and we aren't allowed to overwrite files, 
-          # then we should probably ask. Because that remote changeset didn't 
+          # using the file actively), and we aren't allowed to overwrite files,
+          # then we should probably ask. Because that remote changeset didn't
           # want it, but we clearly do. So ask the user.
           #
           # Otherwise, just remove it.
@@ -787,7 +786,7 @@ module Amp
           # @param [String] file the file in question
           # @param [String] node the file node ID of the file in the local changeset
           def update_remotely_deleted(file, node)
-            # 
+            #
             if node != ancestor.file_node(file) && !overwrite?
               if UI.ask("local changed #{file} which remote deleted\n" +
                         "use (c)hanged version or (d)elete?") == "d"
@@ -840,7 +839,7 @@ module Amp
             n = remote.flags file_remote
             
             # flags are identical, so no merging needed
-            return m if m == n 
+            return m if m == n
             
             # m and n conflict. How do we pick which one to use?
             if m.any? && n.any?
@@ -951,11 +950,11 @@ module Amp
               file, remote_file, filename_dest, flags, move = a.file, a.remote_file, a.file_dest, a.flags, a.move
               UI.debug("preserving #{file} for resolve of #{filename_dest}")
               # look up our changeset for the merge state entry
-              vf_local = working_changeset[file] 
+              vf_local = working_changeset[file]
               vf_other = target_changeset[remote_file]
               vf_base  = vf_local.ancestor(vf_other) || @repo.versioned_file(file, :file_id => Updating::NULL_REV)
               # track this merge!
-              @repo.merge_state.add(vf_local, vf_other, vf_base, filename_dest, flags) 
+              @repo.merge_state.add(vf_local, vf_other, vf_base, filename_dest, flags)
 
               moves << file if file != filename_dest && move
             end

@@ -15,8 +15,8 @@
 #######################################################################
 
 module Amp
-  module Merges
-    module Mercurial
+  module Mercurial
+    module Merges
       
       class MergeAssertion < StandardError; end
       ##

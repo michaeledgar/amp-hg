@@ -15,8 +15,8 @@
 #######################################################################
 
 module Amp
-  module Repositories
-    module Mercurial
+  module Mercurial
+    module RepositoryFormat
       
       ##
       # This module adds verification to Mercurial repositories.
@@ -52,7 +52,7 @@ module Amp
           
           ##
           # Creates a new Verifier. The Verifier can verify a Mercurial repository.
-          # 
+          #
           # @param [Repository] repo the repository this verifier will examine
           def initialize(repo)
             @repository = repo
@@ -136,7 +136,7 @@ module Amp
               
               if manifest_linkrevs[node].empty?
                 error(link_rev, "#{node.short_hex} not in changesets", "manifest")
-              end  
+              end
               manifest_linkrevs.delete node
               
               begin
@@ -231,7 +231,7 @@ module Amp
               link_rev = file_linkrevs[file].first
               
               begin
-                file_log = @repository.file_log file 
+                file_log = @repository.file_log file
               rescue Exception => err
                 error(link_rev, "broken revlog! (#{err})", file)
                 next
@@ -309,7 +309,7 @@ module Amp
             
             # Final cross-check
             if file_node_ids[file] && file_node_ids[file].any?
-              file_node_ids[file].map { |node, link_rev| 
+              file_node_ids[file].map { |node, link_rev|
                 [@manifest[link_rev].link_rev, node]
               }.sort.each do |link_rev, node|
                 error(link_rev, "#{node.short_hex} in manifests not found", file)
@@ -333,7 +333,7 @@ module Amp
             size_diffs = log.checksize
             # checksize returns a hash with these keys: index_diff, data_diff
             if size_diffs[:data_diff] != 0
-              error(nil, "data size off by #{size_diffs[:data_diff]} bytes", name) 
+              error(nil, "data size off by #{size_diffs[:data_diff]} bytes", name)
             end
             if size_diffs[:index_diff] != 0
               error(nil, "index off by #{size_diffs[:index_diff]} bytes", name)
@@ -375,7 +375,7 @@ module Amp
                   error(link_rev, "unknown parent #{parent.short_hex} of #{node.short_hex}", filename)
                 end
               end
-            rescue StandardError => e 
+            rescue StandardError => e
               # TODO: do real exception handling
               exception(link_rev, "error checking parents of #{node.short_hex}: ", e, filename)
             end

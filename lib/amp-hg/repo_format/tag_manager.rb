@@ -15,13 +15,12 @@
 #######################################################################
 
 module Amp
-  module Repositories
-    module Mercurial
-      
+  module Mercurial
+    module RepositoryFormat
       ##
       # = TagManager
       # This module handles all tag-related (but not branch tag) functionality
-      # of the repository. 
+      # of the repository.
       module TagManager
         include Amp::Mercurial::RevlogSupport::Node
         
@@ -158,8 +157,8 @@ module Amp
         #   the changeset
         # @param [String, Integer] node the node to apply the tag to
         # @param [Hash] opts the opts for tagging
-        # @option opts [String] message ("added tag _tag_ to changeset _node_") 
-        #   the commit message to use. 
+        # @option opts [String] message ("added tag _tag_ to changeset _node_")
+        #   the commit message to use.
         # @option opts [Boolean] local (false) is the tag a local one? I.E., will it be
         #   shared across repos?
         # @option opts [String] user ($USER) the username to apply for the commit
@@ -187,12 +186,12 @@ module Amp
           
           staging_area.add(".hgtags") if use_dirstate
           
-          tag_node = commit :modified => [".hgtags"], 
-                            :message => opts[:message], 
-                            :user => opts[:user],
-                            :date => opts[:date],
-                            :parents => [opts[:parent]], 
-                            :extra => opts[:extra]
+          tag_node = commit :modified => [".hgtags"],
+          :message => opts[:message],
+          :user => opts[:user],
+          :date => opts[:date],
+          :parents => [opts[:parent]],
+          :extra => opts[:extra]
           
           tag_node
         end
@@ -281,7 +280,7 @@ module Amp
               UI::warn "Can't parse entry, filename #{filename} line #{count}"
               next
             end
-
+            
             # convert out of file-stored format
             bin_node, tag = node.unhexlify, tag.strip
             
@@ -298,7 +297,7 @@ module Amp
             else
               heads = []
             end
-             # update our tag list
+            # update our tag list
             file_tags[tag] = [bin_node, heads]
           end
           file_tags
@@ -326,7 +325,7 @@ module Amp
           
           # For each tag that we have...
           file_tags.each do |tag, nh|
-            # Is this a reserved, global tag? Or, just one that's been used already? 
+            # Is this a reserved, global tag? Or, just one that's been used already?
             # like "tip"? if not, we're ok
             unless global_tags[tag]
               # register the tag list in the global list.
@@ -341,7 +340,7 @@ module Amp
             # b_node/b_heads - the already-figured-out tag heads
             b_node, b_heads = global_tags[tag]
             # should we use the already-figured-out tag heads instead?
-            if b_node != a_node && b_heads.include?(a_node) && 
+            if b_node != a_node && b_heads.include?(a_node) &&
               (!a_heads.include?(bn) || b_heads.size > a_heads.size)
               a_node = b_node
             end

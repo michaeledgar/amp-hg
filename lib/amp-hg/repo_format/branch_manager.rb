@@ -22,8 +22,8 @@
 ##################################################################
 
 module Amp
-  module Repositories
-    module Mercurial
+  module Mercurial
+    module RepositoryFormat
       ##
       # = BranchManager
       # Michael Scott for Amp.
@@ -51,12 +51,12 @@ module Amp
           
           all_heads = quickly_load_branch_heads(opts[:start])[branch]
           all_heads.reverse!
-
+          
           if !opts[:closed]
             # if a branch is closed, then the head changeset's extra field has "extra" => 1
             all_heads.reject! {|node| self[node].extra["close"]}
           end
-            
+          
           return all_heads
         end
         
@@ -67,10 +67,10 @@ module Amp
         # @return [Hash{String => String}] a hash, keyed by branch name. Each
         #   key goes to the head of that branch
         def branch_tags
-          quickly_load_branch_heads.inject({}) do |hash, (branch, list)| 
+          quickly_load_branch_heads.inject({}) do |hash, (branch, list)|
             # Now we need to try to get an open head, but we'll take a closed
             # one if we have to.
-
+            
             tipmost = list.reverse.find do |node|
               !self[node].extra["close"]
             end
@@ -80,7 +80,7 @@ module Amp
           end
         end
         
-      private
+        private
         
         ##
         # Returns whether the cache is valid or not. Will return false if
@@ -201,7 +201,6 @@ module Amp
             end
           end
         end
-        
       end
     end
   end

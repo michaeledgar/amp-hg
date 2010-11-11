@@ -25,10 +25,10 @@ module Amp
       # pretty damn complicated. Have fun!
       class LocalRepository < Repository
         include Amp::Mercurial::RevlogSupport::Node
-        include Repositories::Mercurial::BranchManager
-        include Repositories::Mercurial::TagManager
-        include Repositories::Mercurial::Updating
-        include Repositories::Mercurial::Verification
+        include Amp::Mercurial::RepositoryFormat::BranchManager
+        include Amp::Mercurial::RepositoryFormat::TagManager
+        include Amp::Mercurial::RepositoryFormat::Updating
+        include Amp::Mercurial::RepositoryFormat::Verification
         
         # The config is an {AmpConfig} for this repo (and uses .hg/hgrc)
         attr_accessor :config
@@ -44,7 +44,7 @@ module Amp
         ##
         # Initializes a new directory to the given path, and with the current
         # configuration.
-        # 
+        #
         # @param [String] path a path to the Repository.
         # @param [Boolean] create Should we create a new one? Usually for
         #   the "amp init" command.
@@ -91,9 +91,9 @@ module Amp
         
         ##
         # Creates this repository's folders and structure.
-        # 
+        #
         # @param [AmpConfig] config the configuration for this user so
-        #   we know what neato features to use (like filename cache) 
+        #   we know what neato features to use (like filename cache)
         # @return [Array<String>] the requirements that we found are returned,
         #   so further configuration can go down.
         def init(config=@config)
@@ -120,9 +120,9 @@ module Amp
         ##
         # Has the repository been changed since the last commit?
         # Returns true if there are NO outstanding changes or uncommitted merges.
-        # 
+        #
         # @return [Boolean] is the repo pristine
-        def pristine?        
+        def pristine?
           dirstate.parents.last == RevlogSupport::Node::NULL_ID &&
           status(:only => [:modified, :added, :removed, :deleted]).all? {|_, v| v.empty? }
         end
@@ -131,11 +131,11 @@ module Amp
         
         ##
         # Gets the changeset at the given revision.
-        # 
+        #
         # @param [String, Integer] rev the revision index (Integer) or
         #   node_id (String) that we want to access. if nil, returns
         #   the working directory. if the string is 'tip', it returns the
-        #   latest head. Can be either a string or an integer; 
+        #   latest head. Can be either a string or an integer;
         #   this shit is smart.
         # @return [Changeset] the changeset at the given revision index or node
         #   id. Could be working directory.
@@ -172,10 +172,10 @@ module Amp
           rescue LockHeld => err
             raise unless wait
             UI.warn("waiting for lock on #{desc} held by #{err.locker}")
-            lock = Lock.new(lockname, :timeout => @config["ui","timeout","600"].to_i, 
+            lock = Lock.new(lockname, :timeout => @config["ui","timeout","600"].to_i,
                                       :release_proc => release_proc, :desc => desc)
           end
-          acquire_proc.call if acquire_proc  
+          acquire_proc.call if acquire_proc
           return lock
         end
         
@@ -253,7 +253,7 @@ module Amp
         ##
         # Gets the file-log for the given path, so we can look at an individual
         # file's history, for example.
-        # 
+        #
         # @param [String] f the path to the file
         # @return [FileLog] a filelog (a type of revision log) for the given file
         def file_log(f)
@@ -301,7 +301,7 @@ module Amp
         ##
         # Reads from a file, but in the working directory.
         # Uses encoding if we are set up to do so.
-        # 
+        #
         # @param [String] filename the file to read from the working directory
         # @return [String] the data read from the file, encoded if we are set
         #   up to do so.
@@ -330,7 +330,7 @@ module Amp
         ##
         # Returns the changelog for this repository. This changelog basically
         # is the history of all commits.
-        # 
+        #
         # @return [ChangeLog] the commit history object for the entire repo.
         def changelog
           return @changelog if @changelog
@@ -348,7 +348,7 @@ module Amp
         
         ##
         # Has the file been modified from node1 to node2?
-        # 
+        #
         # @param [String] file the file to check
         # @param [Hash] opts needs to have :node1 and :node2
         # @return [Boolean] has the +file+ been modified?
@@ -383,7 +383,7 @@ module Amp
         end
         
         ##
-        # Returns all files that have not been merged. In other words, if we're 
+        # Returns all files that have not been merged. In other words, if we're
         # waiting for the user to fix up their merge, then return the list of files
         # we need to be correct before merging.
         #
@@ -421,17 +421,17 @@ module Amp
         ##
         # Returns the merge state for this repository. The merge state keeps track
         # of what files need to be merged for an update to be successfully completed.
-        # 
+        #
         # @return [MergeState] the repository's merge state.
         def merge_state
-          @merge_state ||= Amp::Merges::Mercurial::MergeState.new(self)
+          @merge_state ||= Amp::Mercurial::Merges::MergeState.new(self)
         end
         
         ##
         # Returns the manifest for this repository. The manifest keeps track
         # of what files exist at what times, and if they have certain flags
         # (such as executable, or is it a symlink).
-        # 
+        #
         # @return [Manifest] the manifest for the repository
         def manifest
           return @manifest if @manifest
@@ -444,7 +444,7 @@ module Amp
         # Returns the dirstate for this repository. The dirstate keeps track
         # of files status, such as removed, added, merged, and so on. It also
         # keeps track of the working directory.
-        # 
+        #
         # @return [DirState] the dirstate for this local repository.
         def dirstate
           staging_area.dirstate
@@ -464,7 +464,7 @@ module Amp
     
         ##
         # Joins the path from this repo's path (.hg), to the file provided.
-        # 
+        #
         # @param file the file we need the path for
         # @return [String] the repo's root, joined with the file's path
         def join(file)
@@ -474,9 +474,9 @@ module Amp
         ##
         # Joins the path, with a bunch of other args, to the store's directory.
         # Used for opening {FileLog}s and whatnot.
-        # 
+        #
         # @param file the path to the file
-        # @return [String] the path to the file from the store. 
+        # @return [String] the path to the file from the store.
         def store_join(file)
           @store.join file
         end
@@ -487,7 +487,7 @@ module Amp
         # the latest revision, "null" for the null revision, "tip" for
         # the tip of the repository, a node_id (in hex or binary form) for
         # a revision in the changelog. Yeah. It's a flexible method.
-        # 
+        #
         # @param key the key to lookup in the history of the repo
         # @return [String] a node_id into the changelog for the requested revision
         def lookup(key)
@@ -495,7 +495,7 @@ module Amp
           case key
           when Fixnum, Bignum, Integer
             changelog.node_id_for_index(key)
-          when "." 
+          when "."
             dirstate.parents().first
           when "null", nil
             NULL_ID
@@ -551,7 +551,7 @@ module Amp
         # Pull new changegroups from +remote+
         # This does not apply the changes, but pulls them onto
         # the local server.
-        # 
+        #
         # @param [Repository] remote_repo the remote repository object to pull from
         # @param [Hash] options extra options for pulling
         # @option :heads [Array<String, Fixnum>] ([]) which repository heads to pull, such as
@@ -594,13 +594,13 @@ module Amp
         
         ##
         # Add a changegroup to the repo.
-        # 
+        #
         # Return values:
         # - nothing changed or no source: 0
         # - more heads than before: 1+added_heads (2..n)
         # - fewer heads than before: -1-removed_heads (-2..-n)
         # - number of heads stays the same: 1
-        # 
+        #
         # Don't the first and last conflict? they stay the same if
         # nothing has changed...
         def add_changegroup(source, type, url, opts={:empty => []})
@@ -789,16 +789,16 @@ module Amp
           # If you're here, looking at this code, this bears repeating:
           # - Changelog
           # -- ChangeSet+
-          # 
+          #
           # A Changelog (history of a branch) is an array of ChangeSets,
           # and a ChangeSet is just a single revision, containing what files
           # were changed, who did it, and the commit message. THIS IS JUST A
           # RECEIPT!!!
-          # 
+          #
           # The REASON we construct a changegroup here is because this is called
           # when we push, and we push a changelog (usually bundled to conserve
           # space). This is where we make that receipt, called a changegroup.
-          # 
+          #
           # 'nuff tangent, time to fucking code
           generate_group = proc do
             result = []
@@ -847,25 +847,25 @@ module Amp
         # This function generates a changegroup consisting of all the nodes
         # that are descendents of any of the bases, and ancestors of any of
         # the heads.
-        # 
+        #
         # It is fairly complex in determining which filenodes and which
         # manifest nodes need to be included for the changeset to be complete
         # is non-trivial.
-        # 
+        #
         # Another wrinkle is doing the reverse, figuring out which changeset in
         # the changegroup a particular filenode or manifestnode belongs to.
-        # 
+        #
         # The caller can specify some nodes that must be included in the
         # changegroup using the extranodes argument.  It should be a dict
         # where the keys are the filenames (or 1 for the manifest), and the
         # values are lists of (node, linknode) tuples, where node is a wanted
         # node and linknode is the changelog node that should be transmitted as
         # the linkrev.
-        # 
+        #
         # MAD SHOUTZ to Eric Hopper, who actually had the balls to document a
         # good chunk of this code in the Python. He is a really great man, and
         # deserves whatever thanks we can give him. *Peace*
-        # 
+        #
         # @param [String => [(String, String)]] extra_nodes the key is a filename
         #   and the value is a list of (node, link_node) tuples
         def changegroup_subset(bases, new_heads, source, extra_nodes=nil)
@@ -889,7 +889,7 @@ module Amp
           
           
           # missing changelog list, bases, and heads
-          # 
+          #
           # Some bases may turn out to be superfluous, and some heads may be as
           # well. #nodes_between will return the minimal set of bases and heads
           # necessary to recreate the changegroup.
@@ -936,7 +936,7 @@ module Amp
           # function for a changenode is +identity+
           identity = proc {|x| x }
           
-          # A function generating function. Sets up an enviroment for the 
+          # A function generating function. Sets up an enviroment for the
           # inner function.
           cmp_by_rev_function = proc do |rvlg|
             # Compare two nodes by their revision number in the environment's
@@ -981,7 +981,7 @@ module Amp
             # manifest nodes are potentially required (the recipient may already
             # have them) and total list of all files which were changed in any
             # changeset in the changegroup.
-            # 
+            #
             # We also remember the first changenode we saw any manifest
             # referenced by so we can later determine which changenode owns
             # the manifest.
@@ -1191,8 +1191,8 @@ module Amp
         
         ##
         # Revert a file or group of files to +revision+. If +opts[:unlink]+
-        # is true, then the files 
-        # 
+        # is true, then the files
+        #
         # @param  [Array<String>] files a list of files to revert
         # @return [Boolean] a success marker
         def revert(files=nil, opts={})
@@ -1269,7 +1269,7 @@ module Amp
         
         ##
         # Return list of roots of the subsets of missing nodes from remote
-        # 
+        #
         # If base dict is specified, assume that these nodes and their parents
         # exist on the remote side and that no child of a node of base exists
         # in both remote and self.
@@ -1277,12 +1277,12 @@ module Amp
         # in self and remote but no children exists in self and remote.
         # If a list of heads is specified, return only nodes which are heads
         # or ancestors of these heads.
-        # 
+        #
         # All the ancestors of base are in self and in remote.
         # All the descendants of the list returned are missing in self.
         # (and so we know that the rest of the nodes are missing in remote, see
         # outgoing)
-        # 
+        #
         # @return [Array<String>] the nodes that are missing from the local repository
         #   but are present in the foreign repo. These are the nodes that will be
         #   coming in over the wire.
@@ -1293,12 +1293,12 @@ module Amp
         
         ##
         # Find the common nodes, missing nodes, and remote heads.
-        # 
+        #
         # So in this code, we use  opts[:base] and fetch as hashes
         # instead of arrays. We could very well use arrays, but hashes have
         # O(1) lookup time, and since these could get RFH (Really Fucking
         # Huge), we decided to take the liberty and just use hash for now.
-        # 
+        #
         # If opts[:base] (Hash) is specified, assume that these nodes and their parents
         # exist on the remote side and that no child of a node of base exists
         # in both remote and self.
@@ -1306,9 +1306,9 @@ module Amp
         # in self and remote but no children exists in self and remote.
         # If a list of heads is specified, return only nodes which are heads
         # or ancestors of these heads.
-        # 
+        #
         # All the ancestors of base are in self and in remote.
-        # 
+        #
         # @param [Amp::Core::Repository] remote the repository we're pulling from
         # @param [(Array<String>, Array<String>, Array<String>)] the common nodes, missing nodes, and
         #   remote heads
@@ -1337,7 +1337,7 @@ module Amp
           
           opts[:heads].each do |head|
             if !node_map.include?(head)
-              unknown << head 
+              unknown << head
             else
               opts[:base][head] = true # 1 is stored in the Python
             end
@@ -1353,10 +1353,10 @@ module Amp
           # Search through the remote branches
           # a branch here is a linear part of history, with 4 (four)
           # parts:
-          # 
+          #
           # head, root, first parent, second parent
           # (a branch always has two parents (or none) by definition)
-          # 
+          #
           # Here's where we start using the Hashes instead of Arrays
           # trick. Keep an eye out for opts[:base] and opts[:heads]!
           unknown = remote.branches(*unknown)
@@ -1437,7 +1437,7 @@ module Amp
           
           if opts[:base].keys == [NULL_ID]
             if opts[:force]
-              UI::warn 'repository is unrelated' 
+              UI::warn 'repository is unrelated'
             else
               raise RepoError.new('repository is unrelated')
             end
@@ -1452,7 +1452,7 @@ module Amp
         
         ##
         # Returns the number of revisions the repository is tracking.
-        # 
+        #
         # @return [Integer] how many revisions there have been
         def size
           changelog.size
@@ -1461,7 +1461,7 @@ module Amp
         ##
         # Forgets an added file or files from the repository. Doesn't delete the
         # files, it just says "don't add this on the next commit."
-        # 
+        #
         # Please note that this has different semantics from {DirState#forget}
         #
         # @param [Array, String] list a file path (or list of file paths) to
@@ -1553,7 +1553,7 @@ module Amp
         
         ##
         # Return list of nodes that are roots of subsets not in remote
-        # 
+        #
         # If base dict is specified, assume that these nodes and their parents
         # exist on the remote side.
         # If a list of heads is specified, return only nodes which are heads
@@ -1599,12 +1599,12 @@ module Amp
             return subset, updated_heads.keys
           else
             return subset
-          end 
+          end
         end
         
         ##
         # The branches available in this repository.
-        # 
+        #
         # @param [Array<String>] nodes the list of nodes. this can be optionally left empty
         # @return [Array<String>] the branches, active and inactive!
         def branches(*nodes)
@@ -1637,7 +1637,7 @@ module Amp
         ##
         # Undelete a file. For instance, if you remove something and then
         # find out that you NEED that file, you can use this command.
-        # 
+        #
         # @unused
         #
         # @param [[String]] list the files to be undeleted
@@ -1662,7 +1662,7 @@ module Amp
         
         ##
         # Write data to a file in the CODE repo, not the .hg
-        # 
+        #
         # @param [String] file_name
         # @param [String] data (no trailing newlines are appended)
         # @param [[String]] flags we're really just looking for links
@@ -1700,7 +1700,7 @@ module Amp
         ##
         # Walk recursively through the directory tree (or a changeset)
         # finding all files matched by the match function
-        # 
+        #
         # @param [String, Integer] node selects which changeset to walk
         # @param [Amp::Match] match the matcher decides how to pick the files
         # @param [Array<String>] an array of filenames
@@ -1723,14 +1723,14 @@ module Amp
         
         ##
         # Clone a repository.
-        # 
+        #
         # Here is what this does, pretty much:
         #   % amp init monkey
         #   % cd monkey
         #   % amp pull http://monkey
-        # 
+        #
         # It's so simple it's not even funny.
-        # 
+        #
         # @param [Amp::Core::Repository] remote repository to pull from
         # @param [Array<String>] heads list of revs to clone (forces use of pull)
         # @param [Boolean] stream do we stream from the remote source?
@@ -1752,7 +1752,7 @@ module Amp
         
         ##
         # Stream in the data from +remote+.
-        # 
+        #
         # @param [Amp::Core::Repository] remote repository to pull from
         # @return [Integer] the number of heads in the repository minus 1
         def stream_in(remote)
@@ -1850,14 +1850,14 @@ module Amp
         # and yield to it the changeset and any options to be passed to
         # {AbstractChangeset#commit}. This is only ever called by
         # {AbstractLocalRepository#commit}.
-        # 
+        #
         # @example def pre_commit(opts={})
         #            cs = MyChangeset.new :text => 'asdf', :diff => "asdfasd"
         #            raise "fail" if something_happens
         #            yield cs, opts # well MTV, dis where da magic happen
         #            true
         #          end
-        # 
+        #
         # @yield [String] the result of {AbstractChangeset#commit}
         # @yieldparam [AbstractChangeset] the changeset to commit
         # @yieldparam [Hash] any options to be passed to {AbstractChangeset#commit}
@@ -1938,7 +1938,7 @@ module Amp
         ##
         # do a binary search
         # used by common_nodes
-        # 
+        #
         # Hash info!
         # :find => the stuff we're searching through
         # :on_find => what to do when we've got something new
@@ -2023,7 +2023,7 @@ module Amp
                   l = heads.select {|h| desc.include? h }
                   
                   new_heads << r if l.empty?
-                else  
+                else
                   new_heads << r
                 end
               end
