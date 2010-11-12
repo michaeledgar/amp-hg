@@ -30,8 +30,8 @@ class Net::HTTP
 end
 
 module Amp
-  module Repositories
-    module Mercurial
+  module Mercurial
+    module Repositories
       
       ##
       # = This is the class for connecting to an HTTP[S]-based repository.
@@ -66,7 +66,7 @@ module Amp
         # @param [Amp::AmpConfig] config the configuration for Amp right now.
         def initialize(path="", create=false, config=nil)
           @url, @config = URI.parse(path), config
-          @username ||= @url.user 
+          @username ||= @url.user
           @password ||= @url.password
           @auth_mode = :none
           raise InvalidArgumentError.new("Invalid URL for an HTTP repo!") if @url.nil?
@@ -83,7 +83,7 @@ module Amp
           return @capabilities if @capabilities
           begin
             @capabilities = {}
-            do_read("capabilities")[:body].split.each do |k| 
+            do_read("capabilities")[:body].split.each do |k|
               if k.include? "="
                 key, value = k.split("=", 2)
                 @capabilities[key] = value
@@ -169,7 +169,7 @@ module Amp
         # Asks the server to bundle up all the necessary nodes between the lists
         # bases and heads. It is returned as a stream that reads it in a decompressed
         # fashion. This is for pulls.
-        # 
+        #
         # @param [Array<String>] bases the base nodes of the subset we're requesting.
         #   Should be an array (or any Enumerable) of node ids.
         # @param [Array<String>] heads the heads of the subset we're requesting.
@@ -350,7 +350,7 @@ module Amp
             else
               # They want a username and password. A few routes:
               # First, check the URL for the username:password@host format
-              @username ||= @url.user 
+              @username ||= @url.user
               @password ||= @url.password
               # and start off with basic authentication
               @auth_mode = :basic

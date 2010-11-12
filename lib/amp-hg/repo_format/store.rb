@@ -15,8 +15,8 @@
 #######################################################################
 
 module Amp
-  module Repositories
-    module Mercurial
+  module Mercurial
+    module RepositoryFormat
       module Stores
         extend self
         class StoreError < StandardError; end
@@ -57,7 +57,7 @@ module Amp
           
           ##
           # Joins the file _f_ to the store's base path using the path-joiner.
-          # 
+          #
           # @param [String] f the filename to join to the store's base path
           # @return the combined base path and file path
           def join(f)
@@ -66,7 +66,7 @@ module Amp
           
           ##
           # Iterates over every file tracked in the store and yield it.
-          # 
+          #
           # @yield [file] every file in the store
           # @yieldparam [String] file the filepath to an entry in the store
           def walk
@@ -89,7 +89,7 @@ module Amp
           ##
           # Basic walker that is not very smart at all. It can recursively search
           # for data files, but it actually uses a queue to do its searching.
-          # 
+          #
           # @param [String] relpath the base path to search
           # @param [Boolean] recurse (false) whether or not to recursively
           #   search each discovered directory.
@@ -120,7 +120,7 @@ module Amp
           ##
           # Calculates the mode for the user on the file at the given path.
           # I guess this saves some wasted chmods.
-          # 
+          #
           # @param [String] path the path to calculate the mode for
           # @return [Fixnum] the mode to use for chmod. Octal, like 0777
           def calculate_mode(path)
@@ -167,7 +167,7 @@ module Amp
           ##
           # over-ride the datafiles block so that it decodes filenames before
           # it returns them.
-          # 
+          #
           # @see BasicStore
           def datafiles
             do_walk('data', true) do |a, b, size|
@@ -200,7 +200,7 @@ module Amp
           ##
           # Parses the filename cache, given an object capable of opening
           # a file relative to the right directory.
-          # 
+          #
           # @param [Amp::Opener] opener An opener initialized to the repo's
           #   directory.
           def self.parse(opener)
@@ -230,7 +230,7 @@ module Amp
             ##
             # Initializes a new FNCacheOpener. Requires a normal object capable
             # of opening files.
-            # 
+            #
             # @param [Amp::Opener] opener an opener object initialized to the
             #   appropriate root directory.
             def initialize(opener)
@@ -253,7 +253,7 @@ module Amp
             ##
             # Opens a file while being sure to write the filename if we haven't
             # seen it before. Just like the normal Opener's open() method.
-            # 
+            #
             # @param [String] path the path to the file
             # @param [Fixnum] mode the read/write/append mode
             # @param block the block to pass to it (optional)
@@ -292,7 +292,7 @@ module Amp
           
           ##
           # Initializes the store. Sets up the cache right away.
-          # 
+          #
           # @see BasicStore
           def initialize(path, openerklass, pathjoiner)
             @path_joiner = pathjoiner
@@ -461,7 +461,7 @@ module Amp
         # Max length of 120 means we have a non-reversible encoding,
         # but since the FilenameCache only cares about name lookups, one-way
         # is really all that matters!
-        # 
+        #
         # @param [String] path the path to encode
         # @return [String] an encoded path, with a maximum length of 120.
         def hybrid_encode(path)

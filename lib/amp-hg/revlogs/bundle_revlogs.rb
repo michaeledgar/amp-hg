@@ -15,8 +15,8 @@
 #######################################################################
 
 module Amp
-  module Bundles
-    module Mercurial
+  module Mercurial
+    module Revlogs
       
       ##
       # This module handles revlogs passed to our client (or server)
@@ -120,7 +120,7 @@ module Amp
         # Gets a chunk of data from the datafile (or, if inline, from the index
         # file). Just give it a revision index and which data file to use. Only difference
         # is that this will check the bundlefile if necessary.
-        # 
+        #
         # @param [Fixnum] rev the revision index to extract
         # @param [IO] data_file The IO file descriptor for loading data
         # @return [String] the raw data from the index (posssibly compressed)
@@ -138,7 +138,7 @@ module Amp
         ##
         # Diffs 2 revisions, based on their indices. They are returned in
         # BinaryDiff format.
-        # 
+        #
         # @param [Fixnum] rev1 the index of the source revision
         # @param [Fixnum] rev2 the index of the destination revision
         # @return [String] The diff of the 2 revisions.
@@ -160,7 +160,7 @@ module Amp
         # Given a node ID, extracts that revision and decompresses it. What you get
         # back will the pristine revision data! Checks for bundle-ness when we access
         # a node.
-        # 
+        #
         # @param [String] node the Node ID of the revision to extract.
         # @return [String] the pristine revision data.
         def decompress_revision(node)
@@ -191,7 +191,7 @@ module Amp
           p1, p2 = parents_for_node node
           
           if node != Amp::Mercurial::RevlogSupport::Support.history_hash(text, p1, p2)
-            raise Amp::Mercurial::RevlogSupport::RevlogError.new("integrity check failed on %s:%d, data:%s" % 
+            raise Amp::Mercurial::RevlogSupport::RevlogError.new("integrity check failed on %s:%d, data:%s" %
                                                  [(@index.inline? ? @index_file : @data_file), rev(node), text.inspect])
           end
           

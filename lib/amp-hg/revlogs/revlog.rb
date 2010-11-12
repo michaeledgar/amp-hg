@@ -17,7 +17,6 @@ require 'set'
 
 module Amp
   module Mercurial
-    
     ##
     # = Revlog
     # A revlog is a generic file that represents a revision history. This
@@ -49,7 +48,7 @@ module Amp
       ##
       # Initializes the revision log with an opener object (which handles how
       # the interface to opening the files) and the path to the index itself.
-      # 
+      #
       # @param [Amp::Opener] opener an object that will handle opening the file
       # @param [String] indexfile the path to the index file
       def initialize(opener, indexfile)
@@ -91,7 +90,7 @@ module Amp
       
       ##
       # Returns the unique node_id (a string) for a given revision at _index_.
-      # 
+      #
       # @param [Fixnum] index the index into the list, from 0-(num_revisions - 1).
       # @return [String] the node's ID
       def node_id_for_index(index)
@@ -126,7 +125,7 @@ module Amp
       def parents_for_node(id)
         #index = revision_index_for_node id
         entry = self[id]
-        [ @index[entry.parent_one_rev].node_id , 
+        [ @index[entry.parent_one_rev].node_id ,
           @index[entry.parent_two_rev].node_id ]
       end
       alias_method :parents, :parents_for_node
@@ -190,7 +189,7 @@ module Amp
       
       ##
       # Returns all of the indices for all revisions.
-      # 
+      #
       # @return [Array] all indicies
       def all_indices
         (0..size).to_a
@@ -290,18 +289,18 @@ module Amp
       # Return a tuple containing three elements. Elements 1 and 2 contain
       # a final list bases and heads after all the unreachable ones have been
       # pruned.  Element 0 contains a topologically sorted list of all
-      # 
+      #
       # nodes that satisfy these constraints:
       # 1. All nodes must be descended from a node in roots (the nodes on
       #    roots are considered descended from themselves).
       # 2. All nodes must also be ancestors of a node in heads (the nodes in
       #    heads are considered to be their own ancestors).
-      # 
+      #
       # If roots is unspecified, nullid is assumed as the only root.
       # If heads is unspecified, it is taken to be the output of the
       # heads method (i.e. a list of all nodes in the repository that
       # have no children).
-      # 
+      #
       # @param  [Array<String>] roots
       # @param  [Array<String>] heads
       # @return [{:heads => Array<String>, :roots => Array<String>, :between => Array<String>}]
@@ -464,7 +463,7 @@ module Amp
       
       ##
       # Return the list of all nodes that have no children.
-      # 
+      #
       # if start is specified, only heads that are descendants of
       # start will be returned
       # if stop is specified, it will consider all the revs from stop
@@ -482,7 +481,7 @@ module Amp
         end
         start = NULL_ID if start.nil?
         stop  = [] if stop.nil?
-        stop_revs = {}  
+        stop_revs = {}
         stop.each {|r| stop_revs[revision_index_for_node(r)] = true }
         start_rev = revision_index_for_node start
         reachable = {start_rev => 1}
@@ -564,7 +563,7 @@ module Amp
       end
       
       ##
-      # Loads a block of data into the cache. 
+      # Loads a block of data into the cache.
       def load_cache(data_file, start, cache_length)
         if data_file.nil?
           data_file = open(@index_file) if @index.inline?
@@ -579,7 +578,7 @@ module Amp
       ##
       # Gets a chunk of data from the datafile (or, if inline, from the index
       # file). Just give it a revision index and which data file to use
-      # 
+      #
       # @param  [Fixnum] rev the revision index to extract
       # @param  [IO] data_file The IO file descriptor for loading data
       # @return [String] the raw data from the index (posssibly compressed)
@@ -620,7 +619,7 @@ module Amp
       ##
       # Diffs 2 revisions, based on their indices. They are returned in
       # BinaryDiff format.
-      # 
+      #
       # @param [Fixnum] rev1 the index of the source revision
       # @param [Fixnum] rev2 the index of the destination revision
       # @return [String] The diff of the 2 revisions.
@@ -628,8 +627,8 @@ module Amp
         # is the difference between rev1 and rev2 just the diff in the log itself?
         # because that'st rivial
         if (rev1 + 1 == rev2) && self[rev1].base_rev == self[rev2].base_rev
-          return get_chunk(rev2) 
-        end                        
+          return get_chunk(rev2)
+        end
         Mercurial::Diffs::MercurialDiff.text_diff(decompress_revision(node_id_for_index(rev1)),
                                                   decompress_revision(node_id_for_index(rev2)))
       end
@@ -637,7 +636,7 @@ module Amp
       ##
       # Given a node ID, extracts that revision and decompresses it. What you get
       # back will the pristine revision data!
-      # 
+      #
       # @param [String] node the Node ID of the revision to extract.
       # @return [String] the pristine revision data.
       def decompress_revision(node)
@@ -668,7 +667,7 @@ module Amp
         
         p1, p2 = parents_for_node node
         if node != RevlogSupport::Support.history_hash(text, p1, p2)
-          raise RevlogError.new("integrity check failed on %s:%d, data:%s" % 
+          raise RevlogError.new("integrity check failed on %s:%d, data:%s" %
                                 [(@index.inline? ? @index_file : @data_file), rev, text.inspect])
         end
         @index.cache = [node, rev, text]
@@ -729,7 +728,7 @@ module Amp
       
       ##
       # add a revision to the log
-      # 
+      #
       # @param [String] text the new revision's data to add
       # @param transaction the transaction object used for rollback
       # @param link the linkrev data to add
@@ -762,7 +761,7 @@ module Amp
           base = curr
         end
         
-        entry = IndexEntry.new(RevlogSupport::Support.offset_version(offset, 0), 
+        entry = IndexEntry.new(RevlogSupport::Support.offset_version(offset, 0),
                   len, text.size, base, link, rev(p1), rev(p2), node)
                   
         @index << entry
@@ -775,7 +774,7 @@ module Amp
       ##
       # Finds the most-recent common ancestor for the two nodes.
       def ancestor(a, b)
-        parent_func = proc do |rev| 
+        parent_func = proc do |rev|
           self.parent_indices_for_index(rev).select {|i| i != NULL_REV }
         end
         c = Graphs::AncestorCalculator.ancestors(revision_index_for_node(a),
@@ -844,7 +843,7 @@ module Amp
       end
       
       # Adds a changelog to the index
-      # 
+      #
       # @param [StringIO, #string] revisions something we can iterate over (Usually a StringIO)
       # @param [Proc, #call, #[]] link_mapper
       # @param [Amp::Mercurial::Journal] journal to start a transaction
@@ -909,7 +908,7 @@ module Amp
               else
                 text = Mercurial::Diffs::MercurialPatch.apply_patches(text, [delta])
               end
-              chk = add_revision(text, journal, link, parent1, parent2, 
+              chk = add_revision(text, journal, link, parent1, parent2,
                                     nil, index_file_handle)
               
               if chk != node
@@ -1012,7 +1011,7 @@ module Amp
         res = [ @index_file ]
         res << @data_file unless @index.inline?
         res
-      end 
+      end
     end
   end
 end

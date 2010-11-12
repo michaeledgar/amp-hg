@@ -15,8 +15,8 @@
 #######################################################################
 
 module Amp
-  module Repositories
-    module Mercurial
+  module Mercurial
+    module Repositories
       
       ##
       # = BundleRepository
@@ -108,7 +108,7 @@ module Amp
             # We have no idae what's going on
             raise abort("#{bundle_name}: unknown bundle compression type")
           end
-          # This hash stores pairs of {filename => position_in_bundle_file_of_this_file} 
+          # This hash stores pairs of {filename => position_in_bundle_file_of_this_file}
           @bundle_files_positions = {}
         end
         
@@ -170,7 +170,7 @@ module Amp
         # Gets the file-log for the given path, so we can look at an individual
         # file's history, for example. However, we need to be cognizant of files that
         # traverse the local repository's history as well as the bundle file.
-        # 
+        #
         # @param [String] f the path to the file
         # @return [FileLog] a filelog (a type of revision log) for the given file
         def file(filename)
@@ -199,14 +199,14 @@ module Amp
           
           # Does this file cross local history as well as the bundle?
           if @bundle_files_positions[filename]
-            # If so, we'll need to make a BundleFileLog. Meh. 
+            # If so, we'll need to make a BundleFileLog. Meh.
             @bundle_file.seek @bundle_files_positions[filename]
             Bundles::BundleFileLog.new @store.opener, filename, @bundle_file, proc {|n| changelog.rev(n) }
           else
             # Nope? Make a normal FileLog!
             FileLog.new(@store.opener, filename)
           end
-        end  
+        end
         
         ##
         # Gets the URL for this repository - unused, I believe.

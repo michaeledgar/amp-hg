@@ -132,7 +132,7 @@ module Amp
         end
         
         ##
-        # Returns a stream that will decompress the IO pointed to by file_handle, 
+        # Returns a stream that will decompress the IO pointed to by file_handle,
         # when #read is called upon it. Note: file_handle doesn't have to be a file!
         #
         # @param [String] header the header of the stream. Specifies which compression
@@ -183,7 +183,7 @@ module Amp
           fh.write header
           
           # These 2 variables are for checking to see if #changegroup has been fully
-          # read in or not. 
+          # read in or not.
           empty = false
           count = 0
           

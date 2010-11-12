@@ -15,8 +15,8 @@
 #######################################################################
 
 module Amp
-  module Repositories
-    module Mercurial
+  module Mercurial
+    module RepositoryFormat
       
       ##
       # = Lock
