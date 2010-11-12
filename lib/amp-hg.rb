@@ -4,7 +4,6 @@ require 'zlib'
 require 'stringio'
 
 # Must require the HgPicker or it won't be found.
-require 'amp-hg/repository.rb'
 
 module Amp
   module Mercurial
@@ -57,3 +56,5 @@ module Amp
     autoload :VersionedFile, 'amp-hg/repo_format/versioned_file'
   end
 end
+
+require 'amp-hg/repository.rb'

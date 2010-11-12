@@ -16,8 +16,8 @@
 
 require 'fileutils'
 module Amp
-  module Repositories
-    module Mercurial
+  module Mercurial
+    module Repositories
       
       ##
       # A Local Repository is a repository that works on local repo's, such

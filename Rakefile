@@ -32,6 +32,13 @@ Spec::Rake::SpecTask.new(:rcov) do |spec|
   spec.rcov = true
 end
 
+require 'rake/testtask'
+Rake::TestTask.new do |t|
+  t.libs << 'test'
+  t.test_files = FileList['test/**/test*.rb']
+  t.verbose = true
+end
+
 task :spec => :check_dependencies
 
 begin
@@ -45,7 +52,7 @@ rescue LoadError
   end
 end
 
-task :default => :spec
+task :default => [:spec, :test]
 
 begin
   require 'yard'
