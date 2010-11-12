@@ -45,7 +45,7 @@ module Amp
           
           return a if tl == 0 #empty patches. lame.
           
-          output = StringIO.new "", Support.binary_mode("r+")
+          output = StringIO.new "", Core::Support::RubyVersionUtils.binary_mode("r+")
           output.write source
           
           frags = [[source.size, b1]]
@@ -109,7 +109,7 @@ module Amp
         end
         
         ##
-        # 
+        #
         def self.pull(dst, src, l)
           until l == 0
             f = src.shift
